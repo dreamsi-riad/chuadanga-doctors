@@ -384,12 +384,13 @@ header.nav{
 }
 .dc-body{
   padding:0 18px 13px 17px;
+}
+.dc-tag-row{
   display:flex;
-  flex-direction:column;
-  gap:8px;
+  flex-wrap:wrap;
+  gap:6px;
 }
 .dc-tag{
-  align-self:flex-start;
   display:inline-flex;
   align-items:center;
   gap:6px;
@@ -406,7 +407,6 @@ header.nav{
   border-radius:50%;
   background:var(--accent);
   flex:none;
-}
 }
 
 .no-results{
@@ -486,9 +486,14 @@ header.nav{
   opacity:0.9;
   line-height:1.5;
 }
+.modal-tag-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:12px;
+}
 .modal-tag{
   display:inline-block;
-  margin-top:12px;
   background:rgba(255,255,255,0.2);
   padding:5px 14px;
   border-radius:999px;
@@ -664,7 +669,7 @@ footer p{
       <div class="modal-avatar" id="modalAvatar">ড</div>
       <h3 id="modalName">—</h3>
       <div class="degrees" id="modalDegrees">—</div>
-      <span class="modal-tag" id="modalTag">—</span>
+      <div class="modal-tag-row" id="modalTagRow"></div>
     </div>
     <div class="modal-body" id="modalBody">
       <!-- info-row গুলো JS দিয়ে বসানো হবে -->
@@ -719,12 +724,13 @@ const TAG_RULES = [
   { tag: 'মেডিসিন',            keywords: ['মেডিসিন','ফিজিশিয়ান'] },
 ];
 
-function detectTag(doctor){
+function detectTags(doctor){
   const hay = `${doctor.specialty} ${doctor.degrees} ${doctor.designation}`;
+  const found = [];
   for(const rule of TAG_RULES){
-    if(rule.keywords.some(k => hay.includes(k))) return rule.tag;
+    if(rule.keywords.some(k => hay.includes(k))) found.push(rule.tag);
   }
-  return 'জেনারেল';
+  return found.length ? found : ['জেনারেল'];
 }
 
 /* প্রতিটা স্পেশালিটি ট্যাগের জন্য আলাদা রঙ — কার্ডের বাম পাশের স্ট্রাইপ, অ্যাভাটার ও ব্যাজে ব্যবহার হয়,
@@ -794,8 +800,9 @@ function rowsToDoctors(rows){
       schedule: (r[6]||'').trim(),
       phone: (r[7]||'').trim(),
     };
-    doctor.tag = detectTag(doctor);
-    doctor.search = [doctor.name, doctor.specialty, doctor.degrees, doctor.tag, doctor.institution].join(' ');
+    doctor.tags = detectTags(doctor);
+    doctor.tag = doctor.tags[0]; // প্রাইমারি ট্যাগ — কার্ডের রঙ ও ড্রপডাউন ফিল্টারের ডিফল্ট হিসেবে ব্যবহার হয়
+    doctor.search = [doctor.name, doctor.specialty, doctor.degrees, doctor.tags.join(' '), doctor.institution].join(' ');
     return doctor;
   }).filter(d => d.name);
 }
@@ -832,7 +839,7 @@ const en2bn = n => String(n).replace(/[0-9]/g, d => bnDigits[enDigits.indexOf(d)
 // (এটা Google Sheet থেকে ডেটা লোড হওয়ার পর loadDoctorsFromSheet() থেকে কল হয়)
 function buildSelectOptions(){
   const counts = {};
-  DOCTORS.forEach(d => { counts[d.tag] = (counts[d.tag]||0) + 1; });
+  DOCTORS.forEach(d => { d.tags.forEach(t => { counts[t] = (counts[t]||0) + 1; }); });
   const sortedTags = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
 
   const selectPanel = document.getElementById('selectPanel');
@@ -861,7 +868,7 @@ function renderGrid(){
   let filtered = DOCTORS;
 
   if(activeTag !== 'সবগুলো'){
-    filtered = filtered.filter(d => d.tag === activeTag);
+    filtered = filtered.filter(d => d.tags.includes(activeTag));
   }
   if(searchQuery.trim() !== ''){
     const q = searchQuery.trim();
@@ -884,6 +891,7 @@ function renderGrid(){
 
   grid.innerHTML = filtered.map(d => {
     const c = tagColor(d.tag);
+    const tagBadges = d.tags.map(t => `<span class="dc-tag" style="--accent:${tagColor(t).a}; --accent-pale:${tagColor(t).p}">${t}</span>`).join('');
     return `
     <div class="doctor-card" data-id="${d.id}" style="--accent:${c.a}; --accent-pale:${c.p}">
       <div class="dc-top">
@@ -893,8 +901,8 @@ function renderGrid(){
           <div class="dc-degrees">${d.degrees || 'তথ্য নেই'}</div>
         </div>
       </div>
-      <div class="dc-body">
-        <span class="dc-tag">${d.tag}</span>
+      <div class="dc-body dc-tag-row">
+        ${tagBadges}
       </div>
     </div>
   `;
@@ -985,7 +993,7 @@ function openModal(id){
   document.getElementById('modalAvatar').textContent = initial(d.name);
   document.getElementById('modalName').textContent = d.name;
   document.getElementById('modalDegrees').textContent = d.degrees || 'তথ্য নেই';
-  document.getElementById('modalTag').textContent = d.tag;
+  document.getElementById('modalTagRow').innerHTML = d.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
 
   const ICONS = {
     specialty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>`,
