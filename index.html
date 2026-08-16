@@ -891,7 +891,10 @@ function renderGrid(){
 
   grid.innerHTML = filtered.map(d => {
     const c = tagColor(d.tag);
-    const tagBadges = d.tags.map(t => `<span class="dc-tag" style="--accent:${tagColor(t).a}; --accent-pale:${tagColor(t).p}">${t}</span>`).join('');
+    // কার্ডে ট্যাগ ৪টার বেশি হলে শুধু প্রথম ৪টা (মেইন) দেখানো হয়; ৪টা বা তার কম হলে সবগুলোই দেখানো হয়
+    // (মডালে/ডিটেইলসে কিন্তু সবসময় d.tags-এর সবগুলোই দেখানো হবে — কোনো কাটছাঁট নেই, নিচে দেখুন openModal ফাংশন)
+    const cardTags = d.tags.length > 4 ? d.tags.slice(0, 4) : d.tags;
+    const tagBadges = cardTags.map(t => `<span class="dc-tag" style="--accent:${tagColor(t).a}; --accent-pale:${tagColor(t).p}">${t}</span>`).join('');
     return `
     <div class="doctor-card" data-id="${d.id}" style="--accent:${c.a}; --accent-pale:${c.p}">
       <div class="dc-top">
