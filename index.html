@@ -652,6 +652,122 @@ header.nav{
   line-height:1.6;
 }
 
+/* ---------- ৫.২) "About Us" স্লাইড-ইন প্যানেল — ডান দিক থেকে পেজের মতো এসে ঢাকে ---------- */
+.about-overlay{
+  position:fixed;
+  inset:0;
+  z-index:150;
+  display:none;
+}
+.about-overlay.open{ display:block; }
+.about-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(21,48,43,0.45);
+  opacity:0;
+  transition:opacity .28s ease;
+}
+.about-overlay.open .about-backdrop{ opacity:1; }
+.about-panel{
+  position:absolute;
+  top:0; right:0; bottom:0;
+  width:min(560px, 100%);
+  background:var(--paper);
+  box-shadow:-24px 0 60px rgba(21,48,43,0.28);
+  transform:translateX(100%);
+  transition:transform .38s cubic-bezier(.22,.68,0,1.01);
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.about-overlay.open .about-panel{ transform:translateX(0); }
+.about-panel-head{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:18px 22px;
+  background:rgba(244,242,234,0.96);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.about-panel-head h3{
+  margin:0;
+  font-size:18px;
+  color:var(--teal-deep);
+  font-weight:700;
+}
+.about-panel-close{
+  flex:none;
+  width:34px; height:34px;
+  border-radius:50%;
+  border:none;
+  background:var(--teal-pale);
+  color:var(--teal-deep);
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.about-panel-close:hover{ background:#D6E9E1; }
+.about-panel-body{ padding:22px 22px 40px; }
+.about-hero{ text-align:center; margin-bottom:24px; }
+.about-hero h1{
+  font-size:22px;
+  color:var(--teal-deep);
+  margin:0 0 8px;
+  font-weight:700;
+}
+.about-hero p{ color:var(--ink-soft); font-size:14.5px; margin:0; }
+.about-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:20px 20px;
+  margin-bottom:16px;
+}
+.about-card h2{
+  font-size:16.5px;
+  color:var(--teal-deep);
+  margin:0 0 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+}
+.about-card h2 .ic{
+  width:27px; height:27px;
+  border-radius:8px;
+  background:var(--teal-pale);
+  color:var(--teal-deep);
+  display:flex; align-items:center; justify-content:center;
+  flex:none;
+}
+.about-card h2 .ic svg{ width:14px; height:14px; }
+.about-card p{ color:var(--ink); font-size:14px; margin:0; line-height:1.65; }
+.about-creator-row{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.about-creator-row img{
+  width:48px; height:48px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--teal-pale);
+  flex:none;
+}
+.about-creator-row .creator-name{ font-weight:700; font-size:14.5px; color:var(--ink); }
+.about-creator-row .creator-role{ font-size:12.5px; color:var(--ink-soft); }
+.about-note{
+  background:var(--teal-pale);
+  border:1px dashed var(--line-teal);
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:13px;
+  color:var(--teal-deep);
+  margin-top:20px;
+}
+
 .modal-callbtn{
   margin-top:18px;
   display:flex;
@@ -737,7 +853,7 @@ footer p{
         <div class="nav-menu-panel" id="navMenuPanel" role="menu">
           <a href="#top" class="nav-menu-item" id="navHomeLink" role="menuitem">হোম</a>
           <button type="button" class="nav-menu-item" id="navMessageBtn" role="menuitem">Message Us</button>
-          <a href="about.html" class="nav-menu-item" id="navAboutLink" role="menuitem" target="_blank" rel="noopener">About Us</a>
+          <button type="button" class="nav-menu-item" id="navAboutBtn" role="menuitem">About Us</button>
         </div>
       </div>
     </div>
@@ -838,6 +954,60 @@ footer p{
       </form>
       <div id="contactSuccess" class="contact-success" style="display:none;">
         ধন্যবাদ! আপনার বার্তা পাওয়া গেছে। আমরা শীঘ্রই যোগাযোগ করব।
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ৫.২) "About Us" স্লাইড-ইন প্যানেল — নেভবারের মেনু থেকে খোলে, ডান দিক থেকে স্লাইড করে আসে
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="about-overlay" id="aboutOverlay">
+  <div class="about-backdrop" id="aboutBackdrop"></div>
+  <div class="about-panel" id="aboutPanel">
+    <div class="about-panel-head">
+      <h3>আমাদের সম্পর্কে</h3>
+      <button type="button" class="about-panel-close" id="aboutPanelClose" aria-label="বন্ধ করুন">✕</button>
+    </div>
+    <div class="about-panel-body">
+      <div class="about-hero">
+        <p>Chuadanga Doctors — চুয়াডাঙ্গা জেলার মানুষের জন্য সহজে বিশ্বস্ত চিকিৎসক খুঁজে পাওয়ার একটা ছোট উদ্যোগ।</p>
+      </div>
+
+      <div class="about-card">
+        <h2>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+          আমরা কী করি
+        </h2>
+        <p>এই ওয়েবসাইটে চুয়াডাঙ্গা জেলার বিভিন্ন বিশেষজ্ঞ চিকিৎসকের নাম, ডিগ্রি, বিশেষজ্ঞতা, কর্মস্থল, চেম্বারের ঠিকানা, রোগী দেখার সময়সূচি ও যোগাযোগ নম্বর — এক জায়গায় সাজিয়ে রাখা হয়েছে, যাতে যে কেউ নাম বা বিশেষজ্ঞতা লিখেই দ্রুত প্রয়োজনীয় চিকিৎসক খুঁজে পেতে পারেন।</p>
+      </div>
+
+      <div class="about-card">
+        <h2>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/></svg></span>
+          কেন করি
+        </h2>
+        <p>অনেক সময় হঠাৎ কোনো সমস্যায় পড়লে কোন ডাক্তার দেখাবো, তার চেম্বার কোথায়, কবে বসেন — এসব তথ্য খুঁজে পেতে অনেক সময় নষ্ট হয়ে যায়। আমরা চেয়েছি এই ছোট্ট কষ্টটা কমিয়ে দিতে, যাতে চুয়াডাঙ্গার মানুষ প্রয়োজনের মুহূর্তে দ্রুত সঠিক চিকিৎসকের কাছে পৌঁছাতে পারেন।</p>
+      </div>
+
+      <div class="about-card">
+        <h2>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18a4 4 0 0 0-8 0"/><circle cx="12" cy="11" r="3"/><circle cx="12" cy="12" r="10"/></svg></span>
+          কে তৈরি করেছে
+        </h2>
+        <div class="about-creator-row">
+          <!-- এখানে "PASTE_IMAGE_LINK_HERE" এর জায়গায় আপনার ছবির সরাসরি লিংকটা বসিয়ে দিন -->
+          <img src="https://drive.google.com/thumbnail?id=1yd6NUL92ZgiTMlJkgurBLxZkp1PaNxso&sz=w1000" alt="মাহবুবুজ্জামান রিয়াদ">
+          <div>
+            <div class="creator-name">মাহবুবুজ্জামান রিয়াদ</div>
+            <div class="creator-role">নির্মাতা, Chuadanga Doctors</div>
+          </div>
+        </div>
+        <p>এই ওয়েবসাইটটি স্থানীয়ভাবে, চুয়াডাঙ্গার মানুষের কথা ভেবে তৈরি করা হয়েছে। তথ্যভাণ্ডার নিয়মিত হালনাগাদ করার চেষ্টা করা হয়, তবু কোনো তথ্যে ভুল বা পরিবর্তন থাকলে সংশ্লিষ্ট চেম্বারে যোগাযোগ করে নিশ্চিত হয়ে নেওয়ার অনুরোধ রইলো।</p>
+      </div>
+
+      <div class="about-note">
+        কোনো তথ্য ভুল থাকলে, নতুন কোনো চিকিৎসকের তথ্য যোগ করতে চাইলে, বা কোনো পরামর্শ থাকলে — "Message Us" অপশনে গিয়ে আমাদের জানাতে পারেন।
       </div>
     </div>
   </div>
@@ -1221,11 +1391,20 @@ function openModal(id){
 
   modalOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // মোবাইলে ব্যাক বাটন চাপলে যেন সরাসরি সাইট থেকে বেরিয়ে না গিয়ে
+  // শুধু মডালটা বন্ধ হয়, তাই একটা হিস্টরি স্টেট পুশ করা হচ্ছে
+  history.pushState({ modal: 'doctor' }, '');
 }
 
-function closeModal(){
+function closeModal(fromPopState){
   modalOverlay.classList.remove('open');
   document.body.style.overflow = '';
+  // ইউজার নিজে (X বাটন/ওভারলে/Escape) বন্ধ করলে আমাদের পুশ করা
+  // ডামি হিস্টরি স্টেটটাও সরিয়ে দিতে হবে, নাহলে পরের ব্যাক ক্লিকে কিছু হবে না
+  if(!fromPopState && history.state && history.state.modal === 'doctor'){
+    history.back();
+  }
 }
 
 // নম্বর কপি বাটন হ্যান্ডলার (ইভেন্ট ডেলিগেশন — মডাল বডি প্রতিবার নতুন করে রেন্ডার হয় বলে)
@@ -1292,9 +1471,26 @@ document.getElementById('navHomeLink').addEventListener('click', (e) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// About Us লিংক ক্লিক করলে মেনু বন্ধ হয়ে যাবে, লিংকটা নিজে নতুন ট্যাবে about.html খুলবে
-document.getElementById('navAboutLink').addEventListener('click', () => {
+// ══════════════════════════════════════════════════════════════════════
+// "About Us" স্লাইড-ইন প্যানেল — ডান দিক থেকে স্লাইড করে আসে
+// ══════════════════════════════════════════════════════════════════════
+const aboutOverlay = document.getElementById('aboutOverlay');
+
+function openAboutPanel(){
   toggleNavMenu(false);
+  aboutOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAboutPanel(){
+  aboutOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('navAboutBtn').addEventListener('click', openAboutPanel);
+document.getElementById('aboutPanelClose').addEventListener('click', closeAboutPanel);
+document.getElementById('aboutBackdrop').addEventListener('click', closeAboutPanel);
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeAboutPanel();
 });
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1311,10 +1507,16 @@ function openContactModal(){
   contactSuccess.style.display = 'none';
   contactModalOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // এই মডালেও ব্যাক বাটনে যেন শুধু মডাল বন্ধ হয়, সাইট থেকে বের হয়ে না যায়
+  history.pushState({ modal: 'contact' }, '');
 }
-function closeContactModal(){
+function closeContactModal(fromPopState){
   contactModalOverlay.classList.remove('open');
   document.body.style.overflow = '';
+  if(!fromPopState && history.state && history.state.modal === 'contact'){
+    history.back();
+  }
 }
 
 document.getElementById('navMessageBtn').addEventListener('click', openContactModal);
@@ -1324,6 +1526,13 @@ contactModalOverlay.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape') closeContactModal();
+});
+
+// মোবাইলের ব্যাক বাটন চাপলে ব্রাউজার popstate ইভেন্ট পাঠায় —
+// তখন সাইট থেকে বের না হয়ে, খোলা থাকা মডালটা বন্ধ করে দেওয়া হচ্ছে
+window.addEventListener('popstate', () => {
+  if(modalOverlay.classList.contains('open')) closeModal(true);
+  if(contactModalOverlay.classList.contains('open')) closeContactModal(true);
 });
 
 /* ফর্ম সাবমিট হলে এখানে বার্তাটা প্রসেস হয়। এখন এটা শুধু একটা "ধন্যবাদ" মেসেজ দেখায়।
