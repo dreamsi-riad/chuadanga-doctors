@@ -319,9 +319,11 @@ header.nav{
 }
 
 .doctor-card{
+  --accent: var(--teal);
+  --accent-pale: var(--teal-pale);
   background:var(--card);
   border:1px solid var(--line);
-  border-radius:var(--radius);
+  border-radius:14px;
   position:relative;
   overflow:hidden;
   cursor:pointer;
@@ -329,58 +331,62 @@ header.nav{
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   display:flex;
   flex-direction:column;
+  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+.doctor-card::before{
+  /* top-right folded corner — the signature detail, echoing a clipped ID-card edge */
+  content:"";
+  position:absolute;
+  top:0; right:0;
+  width:16px; height:16px;
+  background:var(--paper);
+  border-bottom:1px solid var(--line);
+  border-left:1px solid var(--line);
+  clip-path:polygon(0 0, 100% 0, 100% 100%);
+}
+.doctor-card::after{
+  /* colored left accent stripe, coded by specialty so cards are scannable at a glance */
+  content:"";
+  position:absolute;
+  top:0; left:0; bottom:0;
+  width:4px;
+  background:var(--accent);
 }
 .doctor-card:hover{
   transform:translateY(-3px);
   box-shadow:var(--shadow);
-  border-color:var(--line-teal);
-}
-/* perforated "tear" edge — the signature detail, echoing a chamber serial slip */
-.doctor-card::before{
-  content:"";
-  display:block;
-  height:0;
-  border-top:2px dashed var(--line-teal);
-  margin:0 16px;
-  position:relative;
-  top:16px;
-}
-.doctor-card::after{
-  content:"";
-  position:absolute;
-  top:14px; left:-6px;
-  width:12px; height:12px;
-  border-radius:50%;
-  background:var(--paper);
-  border:1px solid var(--line);
-  box-shadow:264px 0 0 var(--paper), 264px 0 0 1px var(--line);
+  border-color:var(--accent);
 }
 .dc-top{
-  padding:14px 16px 10px;
+  padding:15px 18px 9px 17px;
   display:flex;
-  gap:10px;
-  align-items:flex-start;
+  gap:11px;
+  align-items:center;
 }
 .dc-avatar{
-  width:38px; height:38px;
-  border-radius:10px;
-  background:var(--teal-pale);
-  color:var(--teal-deep);
+  width:40px; height:40px;
+  border-radius:50%;
+  background:var(--accent-pale);
+  color:var(--accent);
   display:flex;
   align-items:center;
   justify-content:center;
   font-family:'Anek Bangla', serif;
+  font-weight:700;
   font-size:16px;
   flex:none;
+  border:2px solid var(--card);
+  box-shadow:0 0 0 2px var(--accent-pale);
 }
 .dc-name{
   font-family:'Anek Bangla', serif;
+  font-weight:600;
   font-size:15.5px;
   color:var(--ink);
   line-height:1.3;
 }
 .dc-degrees{
-  font-size:12px;
+  font-size:11.5px;
   color:var(--ink-soft);
   margin-top:2px;
   display:-webkit-box;
@@ -389,19 +395,30 @@ header.nav{
   overflow:hidden;
 }
 .dc-body{
-  padding:0 16px 14px;
+  padding:0 18px 13px 17px;
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 .dc-tag{
   align-self:flex-start;
-  font-size:11.5px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
   font-weight:700;
-  color:var(--teal-deep);
-  background:var(--teal-pale);
-  padding:4px 11px;
+  color:var(--accent);
+  background:var(--accent-pale);
+  padding:4px 11px 4px 9px;
   border-radius:999px;
+}
+.dc-tag::before{
+  content:"";
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--accent);
+  flex:none;
+}
 }
 
 .no-results{
@@ -722,6 +739,33 @@ function detectTag(doctor){
   return 'জেনারেল';
 }
 
+/* প্রতিটা স্পেশালিটি ট্যাগের জন্য আলাদা রঙ — কার্ডের বাম পাশের স্ট্রাইপ, অ্যাভাটার ও ব্যাজে ব্যবহার হয়,
+   যাতে স্ক্রল করার সময় রঙ দেখেই বিশেষজ্ঞতার ধরন আন্দাজ করা যায় */
+const TAG_COLORS = {
+  'গাইনী ও প্রসূতি':    { a:'#B8497A', p:'#F7E7EF' },
+  'শিশু রোগ':          { a:'#3E8FB0', p:'#E4F1F6' },
+  'অর্থোপেডিক ও ট্রমা': { a:'#A6672B', p:'#F3E7D8' },
+  'চোখ (চক্ষু)':        { a:'#5B5FC7', p:'#E8E8F7' },
+  'নাক-কান-গলা':        { a:'#C6741F', p:'#FBEEDD' },
+  'হৃদরোগ':             { a:'#C1443C', p:'#FBE6E4' },
+  'কিডনি':              { a:'#2E7D6B', p:'#E1F0EC' },
+  'স্নায়ু/নিউরো':      { a:'#6D4AA0', p:'#EEE6F7' },
+  'চর্ম ও যৌন':         { a:'#B98900', p:'#F8F0D6' },
+  'ডায়াবেটিস':         { a:'#1F7A99', p:'#DFF1F6' },
+  'বাত ব্যথা':          { a:'#8A6D3B', p:'#F1E9D8' },
+  'বক্ষব্যাধি':         { a:'#4472A8', p:'#E4ECF7' },
+  'আল্ট্রাসনোগ্রাফি':   { a:'#6E8F49', p:'#EBF2E0' },
+  'প্যাথলজি':           { a:'#7A5C8E', p:'#F0E8F4' },
+  'পাইলস':              { a:'#9C5B3C', p:'#F3E5DC' },
+  'হোমিওপ্যাথি':        { a:'#4E8264', p:'#E5F0E9' },
+  'সার্জারি':           { a:'#B0413E', p:'#F7E5E4' },
+  'মেডিসিন':            { a:'#0E6B5C', p:'#E4EFEA' },
+  'জেনারেল':            { a:'#5C6B66', p:'#E9EDEB' },
+};
+function tagColor(tag){
+  return TAG_COLORS[tag] || TAG_COLORS['জেনারেল'];
+}
+
 /* সাধারণ CSV পার্সার — কোটেড ফিল্ড, কমা ও লাইনব্রেক-সহ ভ্যালু ঠিকভাবে হ্যান্ডেল করে */
 function parseCSV(text){
   const rows = [];
@@ -850,8 +894,10 @@ function renderGrid(){
   grid.style.display = 'grid';
   noResults.style.display = 'none';
 
-  grid.innerHTML = filtered.map(d => `
-    <div class="doctor-card" data-id="${d.id}">
+  grid.innerHTML = filtered.map(d => {
+    const c = tagColor(d.tag);
+    return `
+    <div class="doctor-card" data-id="${d.id}" style="--accent:${c.a}; --accent-pale:${c.p}">
       <div class="dc-top">
         <div class="dc-avatar">${initial(d.name)}</div>
         <div>
@@ -863,7 +909,8 @@ function renderGrid(){
         <span class="dc-tag">${d.tag}</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   grid.querySelectorAll('.doctor-card').forEach(card => {
     card.addEventListener('click', () => openModal(parseInt(card.dataset.id)));
