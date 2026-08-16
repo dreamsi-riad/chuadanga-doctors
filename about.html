@@ -146,19 +146,19 @@ footer{
   font-size:13px;
 }
 
-/* ---------- হোম পেজ থেকে এই পেজে আসা/যাওয়ার সময় সাধারণ, হালকা fade+slide অ্যানিমেশন ---------- */
+/* ---------- হোম পেজ থেকে এই পেজে আসা/যাওয়ার সময় দ্রুত ও হালকা fade+slide অ্যানিমেশন ---------- */
 body{
-  animation: pageEnter .32s ease both;
+  animation: pageEnter .16s ease-out both;
 }
 body.page-leaving{
-  animation: pageLeave .22s ease forwards;
+  animation: pageLeave .12s ease-in forwards;
 }
 @keyframes pageEnter{
-  from{ opacity:0; transform:translateY(10px); }
+  from{ opacity:0; transform:translateY(6px); }
   to{ opacity:1; transform:translateY(0); }
 }
 @keyframes pageLeave{
-  to{ opacity:0; transform:translateY(-8px); }
+  to{ opacity:0; transform:translateY(-4px); }
 }
 </style>
 </head>
@@ -237,7 +237,7 @@ body.page-leaving{
 history.pushState(null, '', location.href);
 window.addEventListener('popstate', function(){
   document.body.classList.add('page-leaving');
-  setTimeout(() => { window.location.replace('index.html'); }, 150);
+  setTimeout(() => { window.location.replace('index.html'); }, 110);
 });
 
 // "হোমে ফিরুন" লিংকে ক্লিক করলেও আগে হালকা fade-out দেখিয়ে তারপর হোমে যাওয়া হচ্ছে
@@ -245,7 +245,7 @@ document.querySelector('.back-link').addEventListener('click', function(e){
   e.preventDefault();
   const href = this.getAttribute('href');
   document.body.classList.add('page-leaving');
-  setTimeout(() => { window.location.href = href; }, 200);
+  setTimeout(() => { window.location.href = href; }, 110);
 });
 </script>
 
