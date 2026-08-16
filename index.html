@@ -476,17 +476,40 @@ header.nav{
 
 /* ---------- ৫) ডাক্তার ডিটেইলস মডাল/পপআপ ---------- */
 .modal-overlay{
-  display:none;
+  display:flex;
   position:fixed;
   inset:0;
   z-index:100;
   align-items:center;
   justify-content:center;
   padding:20px;
-  background:rgba(21,48,43,0.55);
-  backdrop-filter:blur(2px);
+  background:rgba(21,48,43,0);
+  backdrop-filter:blur(0px);
+  -webkit-backdrop-filter:blur(0px);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:
+    opacity .38s cubic-bezier(.19,1,.22,1),
+    background-color .42s ease,
+    backdrop-filter .42s ease,
+    -webkit-backdrop-filter .42s ease,
+    visibility 0s linear .38s;
 }
-.modal-overlay.open{ display:flex; }
+.modal-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  background:rgba(21,48,43,0.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  transition:
+    opacity .38s cubic-bezier(.19,1,.22,1),
+    background-color .42s ease,
+    backdrop-filter .42s ease,
+    -webkit-backdrop-filter .42s ease,
+    visibility 0s linear 0s;
+}
 .modal-card{
   background:var(--card);
   max-width:520px;
@@ -496,11 +519,18 @@ header.nav{
   border-radius:20px;
   position:relative;
   box-shadow:0 30px 70px rgba(0,0,0,0.35);
-  animation:modalIn .22s ease;
+  transform:translateY(32px) scale(.92);
+  opacity:0;
+  transition:
+    transform .48s cubic-bezier(.22,1.32,.36,1),
+    opacity .32s ease;
 }
-@keyframes modalIn{
-  from{ opacity:0; transform:translateY(14px) scale(.98); }
-  to{ opacity:1; transform:translateY(0) scale(1); }
+.modal-overlay.open .modal-card{
+  transform:translateY(0) scale(1);
+  opacity:1;
+  transition:
+    transform .48s cubic-bezier(.22,1.32,.36,1),
+    opacity .38s ease;
 }
 .modal-head{
   background:linear-gradient(135deg, var(--teal-deep), var(--teal));
@@ -826,6 +856,21 @@ footer p{
   .search-box{ padding:0 5px 0 14px; }
   .doctor-grid{ grid-template-columns:1fr; }
 }
+
+/* ---------- About Us পেজে যাওয়া/থেকে ফেরার সময় সাধারণ, হালকা fade+slide অ্যানিমেশন ---------- */
+body{
+  animation: pageEnter .32s ease both;
+}
+body.page-leaving{
+  animation: pageLeave .22s ease forwards;
+}
+@keyframes pageEnter{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+@keyframes pageLeave{
+  to{ opacity:0; transform:translateY(-8px); }
+}
 </style>
 </head>
 <body>
@@ -853,7 +898,7 @@ footer p{
         <div class="nav-menu-panel" id="navMenuPanel" role="menu">
           <a href="#top" class="nav-menu-item" id="navHomeLink" role="menuitem">হোম</a>
           <button type="button" class="nav-menu-item" id="navMessageBtn" role="menuitem">Message Us</button>
-          <button type="button" class="nav-menu-item" id="navAboutBtn" role="menuitem">About Us</button>
+          <a href="about.html" class="nav-menu-item" id="navAboutBtn" role="menuitem">About Us</a>
         </div>
       </div>
     </div>
@@ -1248,7 +1293,7 @@ function renderGrid(){
   }).join('');
 
   grid.querySelectorAll('.doctor-card').forEach(card => {
-    card.addEventListener('click', () => openModal(parseInt(card.dataset.id)));
+    card.addEventListener('click', (e) => openModal(parseInt(card.dataset.id), e));
   });
 }
 
@@ -1352,9 +1397,20 @@ function phoneRow(iconSvg, label, phoneRaw){
     </div>`;
 }
 
-function openModal(id){
+function openModal(id, sourceEvent){
   const d = DOCTORS.find(x => x.id === id);
   if(!d) return;
+
+  // যেখানে ক্লিক/ট্যাপ করা হয়েছে সেই বিন্দু থেকেই কার্ডটা যেন ফুটে ওঠে,
+  // তাই ক্লিক পজিশন অনুযায়ী transform-origin সেট করা হচ্ছে
+  const modalCard = document.getElementById('modalCard');
+  if(sourceEvent){
+    const ox = ((sourceEvent.clientX / window.innerWidth) * 100).toFixed(1);
+    const oy = ((sourceEvent.clientY / window.innerHeight) * 100).toFixed(1);
+    modalCard.style.transformOrigin = `${ox}% ${oy}%`;
+  } else {
+    modalCard.style.transformOrigin = '50% 50%';
+  }
 
   document.getElementById('modalAvatar').textContent = initial(d.name);
   document.getElementById('modalName').textContent = d.name;
@@ -1486,9 +1542,18 @@ function closeAboutPanel(){
   document.body.style.overflow = '';
 }
 
-document.getElementById('navAboutBtn').addEventListener('click', openAboutPanel);
 document.getElementById('aboutPanelClose').addEventListener('click', closeAboutPanel);
 document.getElementById('aboutBackdrop').addEventListener('click', closeAboutPanel);
+
+// "About Us" এ ক্লিক করলে সরাসরি পেজ বদলে না গিয়ে আগে হালকা fade-out
+// অ্যানিমেশন দেখিয়ে তারপর about.html-এ যাওয়া হচ্ছে — সাধারণ CSS দিয়েই
+document.getElementById('navAboutBtn').addEventListener('click', function(e){
+  e.preventDefault();
+  toggleNavMenu(false);
+  const href = this.getAttribute('href');
+  document.body.classList.add('page-leaving');
+  setTimeout(() => { window.location.href = href; }, 200);
+});
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape') closeAboutPanel();
 });
