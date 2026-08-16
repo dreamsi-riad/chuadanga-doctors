@@ -331,18 +331,6 @@ header.nav{
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   display:flex;
   flex-direction:column;
-  clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-}
-.doctor-card::before{
-  /* top-right folded corner — the signature detail, echoing a clipped ID-card edge */
-  content:"";
-  position:absolute;
-  top:0; right:0;
-  width:16px; height:16px;
-  background:var(--paper);
-  border-bottom:1px solid var(--line);
-  border-left:1px solid var(--line);
-  clip-path:polygon(0 0, 100% 0, 100% 100%);
 }
 .doctor-card::after{
   /* colored left accent stripe, coded by specialty so cards are scannable at a glance */
