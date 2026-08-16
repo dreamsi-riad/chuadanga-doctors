@@ -170,7 +170,7 @@ header.nav{
 
 /* ---------- ২) হিরো / সার্চ সেকশন ---------- */
 .hero{
-  padding:18px 0 14px;
+  padding:12px 0 10px;
   position:relative;
 }
 .hero-inner{
@@ -187,7 +187,7 @@ header.nav{
 }
 
 .search-wrap{
-  margin-top:18px;
+  margin-top:10px;
   position:relative;
   max-width:640px;
   margin-left:auto;
@@ -197,10 +197,12 @@ header.nav{
   display:flex;
   align-items:center;
   gap:10px;
+  height:46px;
+  box-sizing:border-box;
   background:var(--card);
   border:1.5px solid var(--line-teal);
   border-radius:999px;
-  padding:5px 5px 5px 18px;
+  padding:0 5px 0 18px;
   box-shadow:var(--shadow);
 }
 .search-box svg{ flex:none; color:var(--teal); width:19px; height:19px; }
@@ -212,7 +214,8 @@ header.nav{
   font-family:inherit;
   font-size:15px;
   color:var(--ink);
-  padding:9px 0;
+  padding:0;
+  height:100%;
 }
 .search-box input::placeholder{ color:#9AA8A4; }
 .search-clear{
@@ -234,7 +237,8 @@ header.nav{
   color:#fff;
   font-weight:700;
   font-size:13.5px;
-  padding:9px 18px;
+  padding:0 18px;
+  height:36px;
   border-radius:999px;
   flex:none;
   transition:background .15s ease;
@@ -243,7 +247,7 @@ header.nav{
 
 /* ---------- ৩) স্পেশালিটি ফিল্টার — ড্রপডাউন/স্পিনার সিলেক্টর ---------- */
 .select-wrap{
-  margin-top:12px;
+  margin-top:8px;
   position:relative;
   max-width:320px;
   margin-left:auto;
@@ -251,6 +255,8 @@ header.nav{
 }
 .select-btn{
   width:100%;
+  height:46px;
+  box-sizing:border-box;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -258,7 +264,7 @@ header.nav{
   background:var(--card);
   border:1.5px solid var(--line-teal);
   border-radius:999px;
-  padding:8px 8px 8px 18px;
+  padding:0 8px 0 18px;
   box-shadow:var(--shadow);
   font-family:inherit;
   color:var(--teal-deep);
@@ -701,7 +707,7 @@ footer p{
 @media(max-width:640px){
   .nav-meta{ display:none; }
   .search-go{ display:none; }
-  .search-box{ padding:5px 5px 5px 14px; }
+  .search-box{ padding:0 5px 0 14px; }
   .doctor-grid{ grid-template-columns:1fr; }
 }
 </style>
