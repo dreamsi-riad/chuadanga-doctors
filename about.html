@@ -145,6 +145,21 @@ footer{
   text-align:center;
   font-size:13px;
 }
+
+/* ---------- হোম পেজ থেকে এই পেজে আসা/যাওয়ার সময় সাধারণ, হালকা fade+slide অ্যানিমেশন ---------- */
+body{
+  animation: pageEnter .32s ease both;
+}
+body.page-leaving{
+  animation: pageLeave .22s ease forwards;
+}
+@keyframes pageEnter{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+@keyframes pageLeave{
+  to{ opacity:0; transform:translateY(-8px); }
+}
 </style>
 </head>
 <body>
@@ -213,6 +228,26 @@ footer{
 <footer>
   <div class="container">© ２０２６ Chuadanga Doctors — চুয়াডাঙ্গা জেলার চিকিৎসকদের তথ্যভাণ্ডার</div>
 </footer>
+
+<script>
+// এই পেজটা সরাসরি (নতুন ট্যাব/লিংক/সার্চ ইঞ্জিন থেকে) খোলা হলে ব্রাউজার
+// হিস্টরিতে আগে কিছু নাও থাকতে পারে — তখন ফোনের ব্যাক বাটনে চাপলে সরাসরি
+// সাইট থেকে বেরিয়ে যায়। সেটা ঠেকাতে একটা ডামি হিস্টরি স্টেট পুশ করা হচ্ছে,
+// আর ব্যাক চাপলে (popstate) সরাসরি হোম পেজে পাঠিয়ে দেওয়া হচ্ছে।
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function(){
+  document.body.classList.add('page-leaving');
+  setTimeout(() => { window.location.replace('index.html'); }, 150);
+});
+
+// "হোমে ফিরুন" লিংকে ক্লিক করলেও আগে হালকা fade-out দেখিয়ে তারপর হোমে যাওয়া হচ্ছে
+document.querySelector('.back-link').addEventListener('click', function(e){
+  e.preventDefault();
+  const href = this.getAttribute('href');
+  document.body.classList.add('page-leaving');
+  setTimeout(() => { window.location.href = href; }, 200);
+});
+</script>
 
 </body>
 </html>
