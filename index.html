@@ -1230,12 +1230,12 @@ function initial(name){
 function renderGrid(){
   let filtered = DOCTORS;
 
-  if(activeTag !== 'সবগুলো'){
-    filtered = filtered.filter(d => d.tags.includes(activeTag));
-  }
+  // সার্চ বক্সে কিছু লেখা থাকলে সেটাই প্রাধান্য পাবে, স্পিনারের ফিল্টার তখন আর কাজ করবে না
   if(searchQuery.trim() !== ''){
     const q = searchQuery.trim();
     filtered = filtered.filter(d => d.search.includes(q));
+  } else if(activeTag !== 'সবগুলো'){
+    filtered = filtered.filter(d => d.tags.includes(activeTag));
   }
 
   const grid = document.getElementById('doctorGrid');
@@ -1307,6 +1307,13 @@ selectPanel.addEventListener('click', (e) => {
   opt.setAttribute('aria-selected', 'true');
   activeTag = opt.dataset.tag;
   selectBtnLabel.textContent = (activeTag === 'সবগুলো') ? 'বিশেষজ্ঞ বাছাই করুন' : activeTag;
+
+  // স্পিনার থেকে সিলেক্ট করলে সার্চ বক্সে কিছু লেখা থাকলে সেটা খালি করে দেওয়া হচ্ছে,
+  // যাতে স্পিনারের রেজাল্টই দেখা যায়
+  searchInput.value = '';
+  searchQuery = '';
+  searchClear.classList.remove('show');
+
   renderGrid();
   toggleSelect(false);
 });
